@@ -64,6 +64,8 @@ Biblioteca de datos: En su totalidad, el conjunto de datos utilizados contiene e
 El desarrollo sigue la siguiente metodologia:
 - Pre-procesamiento de datos: En esta parte del desarrollo se busca fabricar las pipeline de tratamientos de datos, con ellas se busca transformar los datos de la manera adecuada para poder alimentar y entrenar el modelo de una manera óptima, seleccionar las variables indicadas y para esquematizar las transformaciones de manera automatica
 
+- EDA: extraer insights significativos del conjunto inicial de datos
+
 - Definición de Modelos: En este segmento se definiran los modelos de Machine Learning a utilizar, como XGBoostrap (XGB), asi como el tuneo de sus parametros para buscar cual de todos los modelos entrenados presenta mejor rendimiento
 
 - Ajuste y evaluación de Modelos: Mediante las métricas de rendimiento para medir precisión de los modelos, se buscara dentro de los modelos ajustados con un conjunto de datos de entrenamiento el que presenta mejor rendimiento comparandolos con un conjunto

@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
@@ -60,7 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'intro';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="EDA" href="notebooks.html" />
+    <link rel="next" title="Analitica Descriptiva" href="notebooks.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -178,8 +178,8 @@
             </li>
         </ul>
         <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="notebooks.html">EDA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks_2.html">Modelo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Analitica Descriptiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks_2.html">Analitica Predictiva</a></li>
 </ul>
 
     </div>
@@ -375,11 +375,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Introducción</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#objetivos">Objetivos</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">Datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objetivos">Objetivos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">Datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#esquema-de-desarrollo">Esquema de desarrollo</a></li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -397,20 +396,21 @@ Global Securities Colombia conoce a profundidad el funcionamiento de los product
 <p>Este informe final presenta los hallazgos y resultados obtenidos durante el desarrollo del proyecto, el cual se divide en dos partes fundamentales: analítica descriptiva (EDA) y analítica predictiva (modelado).</p>
 <p>En la primera parte, se llevó a cabo un exhaustivo análisis exploratorio de datos con el fin de extraer insights significativos del conjunto inicial de datos. Este análisis no solo permitió identificar tendencias clave en el mercado de acciones, sino también proporcionó una visión profunda de los factores que influyen en el rendimiento de las empresas. Similar a un Business Intelligence (BI), este enfoque permitió a Global Securities Colombia obtener una comprensión más completa y contextualizada del entorno en el que opera, facilitando así la toma de decisiones fundamentadas.</p>
 <p>En la segunda parte del proyecto, nos adentramos en el campo de la analítica predictiva, donde se quiere implementar un modelo predictivo para estimar la clasificación de si una empresa es favorable o no para comprar acciones. A través de técnicas avanzadas de aprendizaje automático y modelado predictivo, se propone construir un modelo robusto capaz de evaluar una amplia gama de variables independientes y generar predicciones precisas y confiables. Este modelo no solo proporciona a Global Securities Colombia una herramienta invaluable para evaluar el potencial de inversión de diferentes empresas, sino que también allana el camino para una toma de decisiones más ágil y eficaz.</p>
+<p>En este caso de uso, nos enfrentamos al desafío de desarrollar un modelo de clasificación binaria utilizando métodos avanzados de aprendizaje automático, específicamente Support Vector Machines (SVM), Random Forest y Gradient Boosting.</p>
+<p>Contamos con un conjunto de datos exhaustivo que abarca diversas variables financieras clave para varias empresas. El objetivo principal es construir un modelo predictivo que pueda discernir, basándose en estas variables independientes, si es favorable o no invertir en determinadas empresas. Para lograr este objetivo, nos proponemos utilizar técnicas de hiperparametrización y creación de pipelines automatizadas, con el fin de optimizar el rendimiento de nuestros modelos y agilizar el proceso de análisis predictivo.</p>
 <br>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="objetivos">
-<h1>Objetivos<a class="headerlink" href="#objetivos" title="Link to this heading">#</a></h1>
+<section id="objetivos">
+<h2>Objetivos<a class="headerlink" href="#objetivos" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Realizar un análisis exploratorio de datos exhaustivo con el fin de identificar tendencias, patrones y relaciones significativas en el mercado de acciones, así como en los factores que influyen en el rendimiento de las empresas. Este análisis descriptivo permitirá extraer insights relevantes para la toma de decisiones informadas y estratégicas por parte de Global Securities Colombia</p></li>
 <li><p>Implementar técnicas de Machine Learning para desarrollar un modelo
-de clasificación para determinar si cierta firma con determinadas variables financieras es
+de clasificación, entre SVM, RandomForestClassifer y GradientBoostingClassifier,para determinar si cierta firma con determinadas variables financieras es
 favorable para comprar acciones en ella o no con el fin de minimizar pérdidas e impulsar la
 toma de deciones basada en datos para añadir valor al negocio</p></li>
 </ol>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="datos">
-<h1>Datos<a class="headerlink" href="#datos" title="Link to this heading">#</a></h1>
+<section id="datos">
+<h2>Datos<a class="headerlink" href="#datos" title="Link to this heading">#</a></h2>
 <p>Los datos usados en este caso de estudio provienen de un proyecto de aprendizaje de IA llamado “AI Learn to invest” del libro SaturdaysAI - Euskadi 1st edition. Se recopilaron más de 900 inversiones aleatorias con los datos de los últimos 10 años del mercado NYSE (The New York Stock Exchange). Los ratios financieros y la volatilidad fueron calculadas y agregaron al conjunto de datos de inversiones aleatorias.</p>
 <p>Biblioteca de datos: En su totalidad, el conjunto de datos utilizados contiene estas características
 <br></p>
@@ -495,6 +495,20 @@ toma de deciones basada en datos para añadir valor al negocio</p></li>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="esquema-de-desarrollo">
+<h2>Esquema de desarrollo<a class="headerlink" href="#esquema-de-desarrollo" title="Link to this heading">#</a></h2>
+<p>El desarrollo sigue la siguiente metodologia:</p>
+<ul class="simple">
+<li><p>Pre-procesamiento de datos: En esta parte del desarrollo se busca fabricar las pipeline de tratamientos de datos, con ellas se busca transformar los datos de la manera adecuada para poder alimentar y entrenar el modelo de una manera óptima, seleccionar las variables indicadas y para esquematizar las transformaciones de manera automatica</p></li>
+<li><p>EDA: extraer insights significativos del conjunto inicial de datos</p></li>
+<li><p>Definición de Modelos: En este segmento se definiran los modelos de Machine Learning a utilizar, como XGBoostrap (XGB), asi como el tuneo de sus parametros para buscar cual de todos los modelos entrenados presenta mejor rendimiento</p></li>
+<li><p>Ajuste y evaluación de Modelos: Mediante las métricas de rendimiento para medir precisión de los modelos, se buscara dentro de los modelos ajustados con un conjunto de datos de entrenamiento el que presenta mejor rendimiento comparandolos con un conjunto
+de datos de validación</p></li>
+<li><p>Predicción: Por ultimo, con el mejor modelo seleccionado, se establece una funcion para poder estimar la clasificación de una firma dada sus caracteristicas financieras, si es favorable o no</p></li>
+</ul>
+<p>A continuacion se explica el desarrollo celda a celda con el fin de entender ampliamente lo desarrollado, empezando por la pagina del EDA y continuando con el modelado</p>
+</section>
 <div class="toctree-wrapper compound">
 </div>
 </section>
@@ -534,7 +548,7 @@ toma de deciones basada en datos para añadir valor al negocio</p></li>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">EDA</p>
+        <p class="prev-next-title">Analitica Descriptiva</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -554,11 +568,10 @@ toma de deciones basada en datos para añadir valor al negocio</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Introducción</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#objetivos">Objetivos</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">Datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objetivos">Objetivos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">Datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#esquema-de-desarrollo">Esquema de desarrollo</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>
