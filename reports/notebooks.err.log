@@ -15,133 +15,71 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-modelo_logit = logit('investment ~ horizon_days + amount + price_BUY + price_SELL + Volatility_Buy + Volatility_sell + Sharpe_ratio + expected_return_yearly + inflation + nominal_return + ESG_ranking + PE_ratio + EPS_ratio + PS_ratio + PB_ratio + NetProfitMargin_ratio + current_ratio + roa_ratio + roe_ratio', data=data_1).fit()
+modelo_logit = sm.Logit(data_1['investment'], data_1[['Volatility_sell', 'expected_return_yearly', 'inflation', 'nominal_return', 'price_SELL','price_BUY']])
+resultado_modelo = modelo_logit.fit()
 ------------------
 
 
 [1;31m---------------------------------------------------------------------------[0m
-[1;31mNameError[0m                                 Traceback (most recent call last)
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\compat.py:36[0m, in [0;36mcall_and_wrap_exc[1;34m(msg, origin, f, *args, **kwargs)[0m
-[0;32m     35[0m [38;5;28;01mtry[39;00m:
-[1;32m---> 36[0m     [38;5;28;01mreturn[39;00m f([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs)
-[0;32m     37[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
+[1;31mValueError[0m                                Traceback (most recent call last)
+Cell [1;32mIn[24], line 1[0m
+[1;32m----> 1[0m modelo_logit [38;5;241m=[39m [43msm[49m[38;5;241;43m.[39;49m[43mLogit[49m[43m([49m[43mdata_1[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43minvestment[39;49m[38;5;124;43m'[39;49m[43m][49m[43m,[49m[43m [49m[43mdata_1[49m[43m[[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mVolatility_sell[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43mexpected_return_yearly[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43minflation[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43mnominal_return[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43mprice_SELL[39;49m[38;5;124;43m'[39;49m[43m,[49m[38;5;124;43m'[39;49m[38;5;124;43mprice_BUY[39;49m[38;5;124;43m'[39;49m[43m][49m[43m][49m[43m)[49m
+[0;32m      2[0m resultado_modelo [38;5;241m=[39m modelo_logit[38;5;241m.[39mfit()
 
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\eval.py:169[0m, in [0;36mEvalEnvironment.eval[1;34m(self, expr, source_name, inner_namespace)[0m
-[0;32m    168[0m code [38;5;241m=[39m [38;5;28mcompile[39m(expr, source_name, [38;5;124m"[39m[38;5;124meval[39m[38;5;124m"[39m, [38;5;28mself[39m[38;5;241m.[39mflags, [38;5;28;01mFalse[39;00m)
-[1;32m--> 169[0m [38;5;28;01mreturn[39;00m [38;5;28;43meval[39;49m[43m([49m[43mcode[49m[43m,[49m[43m [49m[43m{[49m[43m}[49m[43m,[49m[43m [49m[43mVarLookupDict[49m[43m([49m[43m[[49m[43minner_namespace[49m[43m][49m
-[0;32m    170[0m [43m                                    [49m[38;5;241;43m+[39;49m[43m [49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_namespaces[49m[43m)[49m[43m)[49m
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\discrete\discrete_model.py:475[0m, in [0;36mBinaryModel.__init__[1;34m(self, endog, exog, offset, check_rank, **kwargs)[0m
+[0;32m    472[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m([38;5;28mself[39m, endog, exog, offset[38;5;241m=[39m[38;5;28;01mNone[39;00m, check_rank[38;5;241m=[39m[38;5;28;01mTrue[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[0;32m    473[0m     [38;5;66;03m# unconditional check, requires no extra kwargs added by subclasses[39;00m
+[0;32m    474[0m     [38;5;28mself[39m[38;5;241m.[39m_check_kwargs(kwargs)
+[1;32m--> 475[0m     [38;5;28msuper[39m()[38;5;241m.[39m[38;5;21m__init__[39m(endog, exog, offset[38;5;241m=[39moffset, check_rank[38;5;241m=[39mcheck_rank,
+[0;32m    476[0m                      [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m    477[0m     [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28missubclass[39m([38;5;28mself[39m[38;5;241m.[39m[38;5;18m__class__[39m, MultinomialModel):
+[0;32m    478[0m         [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m np[38;5;241m.[39mall(([38;5;28mself[39m[38;5;241m.[39mendog [38;5;241m>[39m[38;5;241m=[39m [38;5;241m0[39m) [38;5;241m&[39m ([38;5;28mself[39m[38;5;241m.[39mendog [38;5;241m<[39m[38;5;241m=[39m [38;5;241m1[39m)):
 
-File [1;32m<string>:1[0m
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\discrete\discrete_model.py:185[0m, in [0;36mDiscreteModel.__init__[1;34m(self, endog, exog, check_rank, **kwargs)[0m
+[0;32m    183[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m([38;5;28mself[39m, endog, exog, check_rank[38;5;241m=[39m[38;5;28;01mTrue[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[0;32m    184[0m     [38;5;28mself[39m[38;5;241m.[39m_check_rank [38;5;241m=[39m check_rank
+[1;32m--> 185[0m     [38;5;28msuper[39m()[38;5;241m.[39m[38;5;21m__init__[39m(endog, exog, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m    186[0m     [38;5;28mself[39m[38;5;241m.[39mraise_on_perfect_prediction [38;5;241m=[39m [38;5;28;01mFalse[39;00m  [38;5;66;03m# keep for backwards compat[39;00m
+[0;32m    187[0m     [38;5;28mself[39m[38;5;241m.[39mk_extra [38;5;241m=[39m [38;5;241m0[39m
 
-[1;31mNameError[0m: name 'Sharpe_ratio' is not defined
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\model.py:270[0m, in [0;36mLikelihoodModel.__init__[1;34m(self, endog, exog, **kwargs)[0m
+[0;32m    269[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m([38;5;28mself[39m, endog, exog[38;5;241m=[39m[38;5;28;01mNone[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[1;32m--> 270[0m     [38;5;28msuper[39m()[38;5;241m.[39m[38;5;21m__init__[39m(endog, exog, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m    271[0m     [38;5;28mself[39m[38;5;241m.[39minitialize()
 
-The above exception was the direct cause of the following exception:
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\model.py:95[0m, in [0;36mModel.__init__[1;34m(self, endog, exog, **kwargs)[0m
+[0;32m     93[0m missing [38;5;241m=[39m kwargs[38;5;241m.[39mpop([38;5;124m'[39m[38;5;124mmissing[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mnone[39m[38;5;124m'[39m)
+[0;32m     94[0m hasconst [38;5;241m=[39m kwargs[38;5;241m.[39mpop([38;5;124m'[39m[38;5;124mhasconst[39m[38;5;124m'[39m, [38;5;28;01mNone[39;00m)
+[1;32m---> 95[0m [38;5;28mself[39m[38;5;241m.[39mdata [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_handle_data(endog, exog, missing, hasconst,
+[0;32m     96[0m                               [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m     97[0m [38;5;28mself[39m[38;5;241m.[39mk_constant [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mdata[38;5;241m.[39mk_constant
+[0;32m     98[0m [38;5;28mself[39m[38;5;241m.[39mexog [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mdata[38;5;241m.[39mexog
 
-[1;31mPatsyError[0m                                Traceback (most recent call last)
-Cell [1;32mIn[25], line 1[0m
-[1;32m----> 1[0m modelo_logit [38;5;241m=[39m [43mlogit[49m[43m([49m[38;5;124;43m'[39;49m[38;5;124;43minvestment ~ horizon_days + amount + price_BUY + price_SELL + Volatility_Buy + Volatility_sell + Sharpe_ratio + expected_return_yearly + inflation + nominal_return + ESG_ranking + PE_ratio + EPS_ratio + PS_ratio + PB_ratio + NetProfitMargin_ratio + current_ratio + roa_ratio + roe_ratio[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[43mdata[49m[38;5;241;43m=[39;49m[43mdata_1[49m[43m)[49m[38;5;241m.[39mfit()
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\model.py:135[0m, in [0;36mModel._handle_data[1;34m(self, endog, exog, missing, hasconst, **kwargs)[0m
+[0;32m    134[0m [38;5;28;01mdef[39;00m [38;5;21m_handle_data[39m([38;5;28mself[39m, endog, exog, missing, hasconst, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[1;32m--> 135[0m     data [38;5;241m=[39m handle_data(endog, exog, missing, hasconst, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m    136[0m     [38;5;66;03m# kwargs arrays could have changed, easier to just attach here[39;00m
+[0;32m    137[0m     [38;5;28;01mfor[39;00m key [38;5;129;01min[39;00m kwargs:
 
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\model.py:203[0m, in [0;36mModel.from_formula[1;34m(cls, formula, data, subset, drop_cols, *args, **kwargs)[0m
-[0;32m    200[0m [38;5;28;01mif[39;00m missing [38;5;241m==[39m [38;5;124m'[39m[38;5;124mnone[39m[38;5;124m'[39m:  [38;5;66;03m# with patsy it's drop or raise. let's raise.[39;00m
-[0;32m    201[0m     missing [38;5;241m=[39m [38;5;124m'[39m[38;5;124mraise[39m[38;5;124m'[39m
-[1;32m--> 203[0m tmp [38;5;241m=[39m [43mhandle_formula_data[49m[43m([49m[43mdata[49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m,[49m[43m [49m[43mformula[49m[43m,[49m[43m [49m[43mdepth[49m[38;5;241;43m=[39;49m[43meval_env[49m[43m,[49m
-[0;32m    204[0m [43m                          [49m[43mmissing[49m[38;5;241;43m=[39;49m[43mmissing[49m[43m)[49m
-[0;32m    205[0m ((endog, exog), missing_idx, design_info) [38;5;241m=[39m tmp
-[0;32m    206[0m max_endog [38;5;241m=[39m [38;5;28mcls[39m[38;5;241m.[39m_formula_max_endog
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\data.py:675[0m, in [0;36mhandle_data[1;34m(endog, exog, missing, hasconst, **kwargs)[0m
+[0;32m    672[0m     exog [38;5;241m=[39m np[38;5;241m.[39masarray(exog)
+[0;32m    674[0m klass [38;5;241m=[39m handle_data_class_factory(endog, exog)
+[1;32m--> 675[0m [38;5;28;01mreturn[39;00m klass(endog, exog[38;5;241m=[39mexog, missing[38;5;241m=[39mmissing, hasconst[38;5;241m=[39mhasconst,
+[0;32m    676[0m              [38;5;241m*[39m[38;5;241m*[39mkwargs)
 
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\formula\formulatools.py:63[0m, in [0;36mhandle_formula_data[1;34m(Y, X, formula, depth, missing)[0m
-[0;32m     61[0m [38;5;28;01melse[39;00m:
-[0;32m     62[0m     [38;5;28;01mif[39;00m data_util[38;5;241m.[39m_is_using_pandas(Y, [38;5;28;01mNone[39;00m):
-[1;32m---> 63[0m         result [38;5;241m=[39m [43mdmatrices[49m[43m([49m[43mformula[49m[43m,[49m[43m [49m[43mY[49m[43m,[49m[43m [49m[43mdepth[49m[43m,[49m[43m [49m[43mreturn_type[49m[38;5;241;43m=[39;49m[38;5;124;43m'[39;49m[38;5;124;43mdataframe[39;49m[38;5;124;43m'[39;49m[43m,[49m
-[0;32m     64[0m [43m                           [49m[43mNA_action[49m[38;5;241;43m=[39;49m[43mna_action[49m[43m)[49m
-[0;32m     65[0m     [38;5;28;01melse[39;00m:
-[0;32m     66[0m         result [38;5;241m=[39m dmatrices(formula, Y, depth, return_type[38;5;241m=[39m[38;5;124m'[39m[38;5;124mdataframe[39m[38;5;124m'[39m,
-[0;32m     67[0m                            NA_action[38;5;241m=[39mna_action)
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\data.py:84[0m, in [0;36mModelData.__init__[1;34m(self, endog, exog, missing, hasconst, **kwargs)[0m
+[0;32m     82[0m     [38;5;28mself[39m[38;5;241m.[39morig_endog [38;5;241m=[39m endog
+[0;32m     83[0m     [38;5;28mself[39m[38;5;241m.[39morig_exog [38;5;241m=[39m exog
+[1;32m---> 84[0m     [38;5;28mself[39m[38;5;241m.[39mendog, [38;5;28mself[39m[38;5;241m.[39mexog [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_convert_endog_exog[49m[43m([49m[43mendog[49m[43m,[49m[43m [49m[43mexog[49m[43m)[49m
+[0;32m     86[0m [38;5;28mself[39m[38;5;241m.[39mconst_idx [38;5;241m=[39m [38;5;28;01mNone[39;00m
+[0;32m     87[0m [38;5;28mself[39m[38;5;241m.[39mk_constant [38;5;241m=[39m [38;5;241m0[39m
 
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\highlevel.py:309[0m, in [0;36mdmatrices[1;34m(formula_like, data, eval_env, NA_action, return_type)[0m
-[0;32m    299[0m [38;5;250m[39m[38;5;124;03m"""Construct two design matrices given a formula_like and data.[39;00m
-[0;32m    300[0m 
-[0;32m    301[0m [38;5;124;03mThis function is identical to :func:`dmatrix`, except that it requires[39;00m
-[1;32m   (...)[0m
-[0;32m    306[0m [38;5;124;03mSee :func:`dmatrix` for details.[39;00m
-[0;32m    307[0m [38;5;124;03m"""[39;00m
-[0;32m    308[0m eval_env [38;5;241m=[39m EvalEnvironment[38;5;241m.[39mcapture(eval_env, reference[38;5;241m=[39m[38;5;241m1[39m)
-[1;32m--> 309[0m (lhs, rhs) [38;5;241m=[39m [43m_do_highlevel_design[49m[43m([49m[43mformula_like[49m[43m,[49m[43m [49m[43mdata[49m[43m,[49m[43m [49m[43meval_env[49m[43m,[49m
-[0;32m    310[0m [43m                                  [49m[43mNA_action[49m[43m,[49m[43m [49m[43mreturn_type[49m[43m)[49m
-[0;32m    311[0m [38;5;28;01mif[39;00m lhs[38;5;241m.[39mshape[[38;5;241m1[39m] [38;5;241m==[39m [38;5;241m0[39m:
-[0;32m    312[0m     [38;5;28;01mraise[39;00m PatsyError([38;5;124m"[39m[38;5;124mmodel is missing required outcome variables[39m[38;5;124m"[39m)
+File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\data.py:509[0m, in [0;36mPandasData._convert_endog_exog[1;34m(self, endog, exog)[0m
+[0;32m    507[0m exog [38;5;241m=[39m exog [38;5;28;01mif[39;00m exog [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m [38;5;28;01melse[39;00m np[38;5;241m.[39masarray(exog)
+[0;32m    508[0m [38;5;28;01mif[39;00m endog[38;5;241m.[39mdtype [38;5;241m==[39m [38;5;28mobject[39m [38;5;129;01mor[39;00m exog [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mand[39;00m exog[38;5;241m.[39mdtype [38;5;241m==[39m [38;5;28mobject[39m:
+[1;32m--> 509[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([38;5;124m"[39m[38;5;124mPandas data cast to numpy dtype of object. [39m[38;5;124m"[39m
+[0;32m    510[0m                      [38;5;124m"[39m[38;5;124mCheck input data with np.asarray(data).[39m[38;5;124m"[39m)
+[0;32m    511[0m [38;5;28;01mreturn[39;00m [38;5;28msuper[39m()[38;5;241m.[39m_convert_endog_exog(endog, exog)
 
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\highlevel.py:164[0m, in [0;36m_do_highlevel_design[1;34m(formula_like, data, eval_env, NA_action, return_type)[0m
-[0;32m    162[0m [38;5;28;01mdef[39;00m [38;5;21mdata_iter_maker[39m():
-[0;32m    163[0m     [38;5;28;01mreturn[39;00m [38;5;28miter[39m([data])
-[1;32m--> 164[0m design_infos [38;5;241m=[39m [43m_try_incr_builders[49m[43m([49m[43mformula_like[49m[43m,[49m[43m [49m[43mdata_iter_maker[49m[43m,[49m[43m [49m[43meval_env[49m[43m,[49m
-[0;32m    165[0m [43m                                  [49m[43mNA_action[49m[43m)[49m
-[0;32m    166[0m [38;5;28;01mif[39;00m design_infos [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
-[0;32m    167[0m     [38;5;28;01mreturn[39;00m build_design_matrices(design_infos, data,
-[0;32m    168[0m                                  NA_action[38;5;241m=[39mNA_action,
-[0;32m    169[0m                                  return_type[38;5;241m=[39mreturn_type)
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\highlevel.py:66[0m, in [0;36m_try_incr_builders[1;34m(formula_like, data_iter_maker, eval_env, NA_action)[0m
-[0;32m     64[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(formula_like, ModelDesc):
-[0;32m     65[0m     [38;5;28;01massert[39;00m [38;5;28misinstance[39m(eval_env, EvalEnvironment)
-[1;32m---> 66[0m     [38;5;28;01mreturn[39;00m [43mdesign_matrix_builders[49m[43m([49m[43m[[49m[43mformula_like[49m[38;5;241;43m.[39;49m[43mlhs_termlist[49m[43m,[49m
-[0;32m     67[0m [43m                                   [49m[43mformula_like[49m[38;5;241;43m.[39;49m[43mrhs_termlist[49m[43m][49m[43m,[49m
-[0;32m     68[0m [43m                                  [49m[43mdata_iter_maker[49m[43m,[49m
-[0;32m     69[0m [43m                                  [49m[43meval_env[49m[43m,[49m
-[0;32m     70[0m [43m                                  [49m[43mNA_action[49m[43m)[49m
-[0;32m     71[0m [38;5;28;01melse[39;00m:
-[0;32m     72[0m     [38;5;28;01mreturn[39;00m [38;5;28;01mNone[39;00m
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\build.py:693[0m, in [0;36mdesign_matrix_builders[1;34m(termlists, data_iter_maker, eval_env, NA_action)[0m
-[0;32m    689[0m factor_states [38;5;241m=[39m _factors_memorize(all_factors, data_iter_maker, eval_env)
-[0;32m    690[0m [38;5;66;03m# Now all the factors have working eval methods, so we can evaluate them[39;00m
-[0;32m    691[0m [38;5;66;03m# on some data to find out what type of data they return.[39;00m
-[0;32m    692[0m (num_column_counts,
-[1;32m--> 693[0m  cat_levels_contrasts) [38;5;241m=[39m [43m_examine_factor_types[49m[43m([49m[43mall_factors[49m[43m,[49m
-[0;32m    694[0m [43m                                               [49m[43mfactor_states[49m[43m,[49m
-[0;32m    695[0m [43m                                               [49m[43mdata_iter_maker[49m[43m,[49m
-[0;32m    696[0m [43m                                               [49m[43mNA_action[49m[43m)[49m
-[0;32m    697[0m [38;5;66;03m# Now we need the factor infos, which encapsulate the knowledge of[39;00m
-[0;32m    698[0m [38;5;66;03m# how to turn any given factor into a chunk of data:[39;00m
-[0;32m    699[0m factor_infos [38;5;241m=[39m {}
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\build.py:443[0m, in [0;36m_examine_factor_types[1;34m(factors, factor_states, data_iter_maker, NA_action)[0m
-[0;32m    441[0m [38;5;28;01mfor[39;00m data [38;5;129;01min[39;00m data_iter_maker():
-[0;32m    442[0m     [38;5;28;01mfor[39;00m factor [38;5;129;01min[39;00m [38;5;28mlist[39m(examine_needed):
-[1;32m--> 443[0m         value [38;5;241m=[39m [43mfactor[49m[38;5;241;43m.[39;49m[43meval[49m[43m([49m[43mfactor_states[49m[43m[[49m[43mfactor[49m[43m][49m[43m,[49m[43m [49m[43mdata[49m[43m)[49m
-[0;32m    444[0m         [38;5;28;01mif[39;00m factor [38;5;129;01min[39;00m cat_sniffers [38;5;129;01mor[39;00m guess_categorical(value):
-[0;32m    445[0m             [38;5;28;01mif[39;00m factor [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m cat_sniffers:
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\eval.py:568[0m, in [0;36mEvalFactor.eval[1;34m(self, memorize_state, data)[0m
-[0;32m    567[0m [38;5;28;01mdef[39;00m [38;5;21meval[39m([38;5;28mself[39m, memorize_state, data):
-[1;32m--> 568[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_eval[49m[43m([49m[43mmemorize_state[49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43meval_code[39;49m[38;5;124;43m"[39;49m[43m][49m[43m,[49m
-[0;32m    569[0m [43m                      [49m[43mmemorize_state[49m[43m,[49m
-[0;32m    570[0m [43m                      [49m[43mdata[49m[43m)[49m
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\eval.py:551[0m, in [0;36mEvalFactor._eval[1;34m(self, code, memorize_state, data)[0m
-[0;32m    549[0m [38;5;28;01mdef[39;00m [38;5;21m_eval[39m([38;5;28mself[39m, code, memorize_state, data):
-[0;32m    550[0m     inner_namespace [38;5;241m=[39m VarLookupDict([data, memorize_state[[38;5;124m"[39m[38;5;124mtransforms[39m[38;5;124m"[39m]])
-[1;32m--> 551[0m     [38;5;28;01mreturn[39;00m [43mcall_and_wrap_exc[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mError evaluating factor[39;49m[38;5;124;43m"[39;49m[43m,[49m
-[0;32m    552[0m [43m                             [49m[38;5;28;43mself[39;49m[43m,[49m
-[0;32m    553[0m [43m                             [49m[43mmemorize_state[49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43meval_env[39;49m[38;5;124;43m"[39;49m[43m][49m[38;5;241;43m.[39;49m[43meval[49m[43m,[49m
-[0;32m    554[0m [43m                             [49m[43mcode[49m[43m,[49m
-[0;32m    555[0m [43m                             [49m[43minner_namespace[49m[38;5;241;43m=[39;49m[43minner_namespace[49m[43m)[49m
-
-File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\patsy\compat.py:43[0m, in [0;36mcall_and_wrap_exc[1;34m(msg, origin, f, *args, **kwargs)[0m
-[0;32m     39[0m     new_exc [38;5;241m=[39m PatsyError([38;5;124m"[39m[38;5;132;01m%s[39;00m[38;5;124m: [39m[38;5;132;01m%s[39;00m[38;5;124m: [39m[38;5;132;01m%s[39;00m[38;5;124m"[39m
-[0;32m     40[0m                          [38;5;241m%[39m (msg, e[38;5;241m.[39m[38;5;18m__class__[39m[38;5;241m.[39m[38;5;18m__name__[39m, e),
-[0;32m     41[0m                          origin)
-[0;32m     42[0m     [38;5;66;03m# Use 'exec' to hide this syntax from the Python 2 parser:[39;00m
-[1;32m---> 43[0m     [43mexec[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mraise new_exc from e[39;49m[38;5;124;43m"[39;49m[43m)[49m
-[0;32m     44[0m [38;5;28;01melse[39;00m:
-[0;32m     45[0m     [38;5;66;03m# In python 2, we just let the original exception escape -- better[39;00m
-[0;32m     46[0m     [38;5;66;03m# than destroying the traceback. But if it's a PatsyError, we can[39;00m
-[0;32m     47[0m     [38;5;66;03m# at least set the origin properly.[39;00m
-[0;32m     48[0m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(e, PatsyError):
-
-File [1;32m<string>:1[0m
-
-[1;31mPatsyError[0m: Error evaluating factor: NameError: name 'Sharpe_ratio' is not defined
-    investment ~ horizon_days + amount + price_BUY + price_SELL + Volatility_Buy + Volatility_sell + Sharpe_ratio + expected_return_yearly + inflation + nominal_return + ESG_ranking + PE_ratio + EPS_ratio + PS_ratio + PB_ratio + NetProfitMargin_ratio + current_ratio + roa_ratio + roe_ratio
-                                                                                                     ^^^^^^^^^^^^
+[1;31mValueError[0m: Pandas data cast to numpy dtype of object. Check input data with np.asarray(data).
 
