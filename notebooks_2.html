@@ -375,10 +375,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-librerias">Importación de librerias</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-datos">Importacion de datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-datos">Importación de datos</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizacion">Parametrización</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelos-de-clasificacion">Modelos de clasificación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metodologia-propuesta">Metodologia propuesta</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#support-vector-machines">Support Vector Machines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#random-forest">Random Forest</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost">XGBoost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visibilidad-y-entendimiento-del-modelo">Visibilidad y entendimiento del modelo</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-del-modelo">Importacion del modelo</a></li>
 </ul>
@@ -416,10 +419,10 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">GradientBoostingClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span><span class="n">cross_val_score</span><span class="p">,</span><span class="n">ShuffleSplit</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">tree</span>
 <span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">confusion_matrix</span><span class="p">,</span><span class="n">ConfusionMatrixDisplay</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">confusion_matrix</span><span class="p">,</span><span class="n">ConfusionMatrixDisplay</span><span class="p">,</span><span class="n">recall_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">f1_score</span>
 <span class="kn">import</span> <span class="nn">shap</span>
 </pre></div>
 </div>
@@ -433,7 +436,7 @@ document.write(`
 </div>
 </section>
 <section id="importacion-de-datos">
-<h2>Importacion de datos<a class="headerlink" href="#importacion-de-datos" title="Link to this heading">#</a></h2>
+<h2>Importación de datos<a class="headerlink" href="#importacion-de-datos" title="Link to this heading">#</a></h2>
 <p>Nos conectamos a la Base de datos que tenemos en la nube</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -783,21 +786,15 @@ Ensemble Learning: Random Forest combina múltiples árboles de decisión para a
 <p><span class="caption-number">Fig. 2 </span><span class="caption-text">Funcionamiento de la busqueda de malla (Grid Search) en SciKit-learn</span><a class="headerlink" href="#grid-search-fig" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>Dividimos el conjunto de datos de entrenamiento (train) y pruebas (test)</p>
+</section>
+<section id="support-vector-machines">
+<h2>Support Vector Machines<a class="headerlink" href="#support-vector-machines" title="Link to this heading">#</a></h2>
+<p>Como se menciona anteriormente, Se propone hiper-parametrizar cada modelo junto con la aplciacion de pipelines de preprocesamiento, ahora, se busca que en los modelos propuestos se entrenen mediante validación cruzada anidada. En esta técnica, se busca tener un bucle externo sobre las divisiones de los datos en conjuntos de entrenamiento y de prueba. Para cada uno de ellos, se ejecuta una búsqueda en red, lo cual puede dar lugar a diferentes parámetros óptimos para cada división en el bucle externo</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Definimos el preprocesamiento de datos, acá buscamos aplicar diversas transformaciones a diferentes columnas antes de entrenar el modelo, en este caso, aplicaremos <code class="docutils literal notranslate"><span class="pre">OrdinalEncoder()</span></code> a las columnas categoricas</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocessor</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocessor_svc</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
     <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">OrdinalEncoder</span><span class="p">(),</span> <span class="n">VAR_categorical_cols</span><span class="p">)</span>
-        <span class="c1">#,(&#39;num&#39;, StandardScaler(), VAR_numerical_cols)</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">VAR_numerical_cols</span><span class="p">)</span>
     <span class="p">],</span>
     <span class="n">remainder</span><span class="o">=</span><span class="s1">&#39;passthrough&#39;</span>
 <span class="p">)</span>
@@ -805,127 +802,387 @@ Ensemble Learning: Random Forest combina múltiples árboles de decisión para a
 </div>
 </div>
 </div>
-<p>Definimos nuestro diccionario de clasificadores. Acá buscamos dejar en una estructura los 3 tipos de clasificadores que usaremos en la propuesta de mejora</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifiers</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;SVC&#39;</span><span class="p">:</span> <span class="n">SVC</span><span class="p">(),</span>
-    <span class="s1">&#39;RandomForestClassifier&#39;</span><span class="p">:</span> <span class="n">RandomForestClassifier</span><span class="p">(),</span>
-    <span class="s1">&#39;GradientBoostingClassifier&#39;</span><span class="p">:</span> <span class="n">GradientBoostingClassifier</span><span class="p">()</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Con el objetivo de hacer un grid search (busqueda de malla), para hiperparametrizar cada uno de las 3 clases de clasificadores, se define param_grid, que contiene diferentes combinaciones de parametros para cada uno delos 3 modelo</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Paso 4: Define un diccionario de parámetros para cada clasificador</span>
-<span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;SVC&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;classifier__C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s1">&#39;classifier__kernel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;rbf&#39;</span><span class="p">],</span><span class="s1">&#39;classifier__gamma&#39;</span><span class="p">:[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">]},</span>
-    <span class="s1">&#39;RandomForestClassifier&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;classifier__n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="s1">&#39;classifier__max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span><span class="s1">&#39;classifier__min_samples_split&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]},</span>
-    <span class="s1">&#39;GradientBoostingClassifier&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;classifier__n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="s1">&#39;classifier__learning_rate&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;classifier__max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Ahora juntamos los 3 pasos anteriores para hacer un pipeline para cada tipo de modelo. El pipeline se utiliza para dejar encapsulado los pasos de preprocesamientos necesario previos a la estimación. Asi, al estimar con este objeto tipo <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> nos aseguramos de que los nuevos datos sin procesar se reprocesen antes de la estimación nueva</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Paso 5: Define un diccionario de pipelines</span>
-<span class="n">pipelines</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">classifier</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">pipelines</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-        <span class="p">(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">classifier</span><span class="p">)</span>
-    <span class="p">])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>En este ciclo, buscamos buscar el mejor modelo haciendo uso de <code class="docutils literal notranslate"><span class="pre">GridSearchCV()</span></code>, este tambien hace cross-validation internamente</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Paso 6: Utiliza GridSearchCV para buscar los mejores parámetros</span>
-<span class="n">best_models</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">training_accuracies</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="n">pipelines</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">grid_search2</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">)</span>
-    <span class="n">grid_search2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-    <span class="n">msg_training</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;accuracy en training -&gt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: best training score </span><span class="si">{</span><span class="n">grid_search2</span><span class="o">.</span><span class="n">best_score_</span><span class="si">}</span><span class="s2">, modelo ganador </span><span class="si">{</span><span class="n">grid_search2</span><span class="o">.</span><span class="n">best_estimator_</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">msg_training</span><span class="p">)</span>
-    <span class="n">best_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_search2</span><span class="o">.</span><span class="n">best_estimator_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param_grid_svc</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;classifier__C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="s1">&#39;classifier__kernel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;rbf&#39;</span><span class="p">,</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">],</span><span class="s1">&#39;classifier__gamma&#39;</span><span class="p">:[</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">]}</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">best_models</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipelines_svc</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">preprocessor_svc</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">SVC</span><span class="p">())</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>La funcion ShuffleSplit divide los datos en conjuntos de entrenamiento y prueba de tamaño igual (50% cada uno en este caso) de forma aleatoria en cada iteración de la validación cruzada. Esto ayuda a obtener una estimación más robusta del rendimiento del modelo al promediar los resultados sobre múltiples divisiones aleatorias de los datos.</p>
+<p>test_size: Esto especifica el tamaño del conjunto de datos de prueba. En este caso, se establece en 0.5, lo que significa que el 50% de los datos se utilizarán como conjunto de prueba en cada iteración de la validación cruzada.</p>
+<p>train_size: Esto especifica el tamaño del conjunto de datos de entrenamiento. Al igual que test_size, está establecido en 0.5, lo que significa que el 50% de los datos se utilizarán como conjunto de entrenamiento en cada iteración de la validación cruzada.</p>
+<p>n_splits: Esto especifica el número de divisiones diferentes que se crearán en los datos. En este caso, se establece en 10, lo que significa que se realizarán 10 iteraciones de la validación cruzada.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shuffle_split</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">test_size</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid_search_svc</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">pipelines_svc</span><span class="p">,</span> <span class="n">param_grid_svc</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">shuffle_split</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;recall&#39;</span><span class="p">)</span>
+<span class="n">grid_search_results</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">grid_search_svc</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross-validation scores: &quot;</span><span class="p">,</span> <span class="n">grid_search_results</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean cross-validation score: &quot;</span><span class="p">,</span> <span class="n">grid_search_results</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;SVC&#39;: Pipeline(steps=[(&#39;preprocessor&#39;,
-                  ColumnTransformer(remainder=&#39;passthrough&#39;,
-                                    transformers=[(&#39;cat&#39;, OrdinalEncoder(),
-                                                   [])])),
-                 (&#39;classifier&#39;, SVC(C=10, gamma=0.1, kernel=&#39;linear&#39;))]),
- &#39;RandomForestClassifier&#39;: Pipeline(steps=[(&#39;preprocessor&#39;,
-                  ColumnTransformer(remainder=&#39;passthrough&#39;,
-                                    transformers=[(&#39;cat&#39;, OrdinalEncoder(),
-                                                   [])])),
-                 (&#39;classifier&#39;, RandomForestClassifier(min_samples_split=20))]),
- &#39;GradientBoostingClassifier&#39;: Pipeline(steps=[(&#39;preprocessor&#39;,
-                  ColumnTransformer(remainder=&#39;passthrough&#39;,
-                                    transformers=[(&#39;cat&#39;, OrdinalEncoder(),
-                                                   [])])),
-                 (&#39;classifier&#39;,
-                  GradientBoostingClassifier(learning_rate=0.01, max_depth=None,
-                                             n_estimators=50))])}
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">grid_search_svc</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">pipelines_svc</span><span class="p">,</span> <span class="n">param_grid_svc</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">shuffle_split</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;recall&#39;</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">grid_search_results</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">grid_search_svc</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross-validation scores: &quot;</span><span class="p">,</span> <span class="n">grid_search_results</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean cross-validation score: &quot;</span><span class="p">,</span> <span class="n">grid_search_results</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\_param_validation.py:213,</span> in <span class="ni">validate_params.&lt;locals&gt;.decorator.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">208</span>     <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span>         <span class="n">skip_parameter_validation</span><span class="o">=</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>             <span class="n">prefer_skip_nested_validation</span> <span class="ow">or</span> <span class="n">global_skip_validation</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>         <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">213</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span> <span class="k">except</span> <span class="n">InvalidParameterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">215</span>     <span class="c1"># When the function is just a wrapper around an estimator, we allow</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span>     <span class="c1"># the function to delegate validation to the estimator, but we replace</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="c1"># the name of the estimator by the name of the function in the error</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="c1"># message to avoid confusion.</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="n">msg</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">220</span>         <span class="sa">r</span><span class="s2">&quot;parameter of \w+ must be&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">221</span>         <span class="sa">f</span><span class="s2">&quot;parameter of </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2"> must be&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">222</span>         <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_validation.py:719,</span> in <span class="ni">cross_val_score</span><span class="nt">(estimator, X, y, groups, scoring, cv, n_jobs, verbose, fit_params, params, pre_dispatch, error_score)</span>
+<span class="g g-Whitespace">    </span><span class="mi">716</span> <span class="c1"># To ensure multimetric format is not supported</span>
+<span class="g g-Whitespace">    </span><span class="mi">717</span> <span class="n">scorer</span> <span class="o">=</span> <span class="n">check_scoring</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">719</span> <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">720</span>     <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">721</span>     <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">722</span>     <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">723</span>     <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">724</span>     <span class="n">scoring</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">scorer</span><span class="p">},</span>
+<span class="g g-Whitespace">    </span><span class="mi">725</span>     <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">726</span>     <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">727</span>     <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">728</span>     <span class="n">fit_params</span><span class="o">=</span><span class="n">fit_params</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">729</span>     <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">730</span>     <span class="n">pre_dispatch</span><span class="o">=</span><span class="n">pre_dispatch</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">731</span>     <span class="n">error_score</span><span class="o">=</span><span class="n">error_score</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">732</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">733</span> <span class="k">return</span> <span class="n">cv_results</span><span class="p">[</span><span class="s2">&quot;test_score&quot;</span><span class="p">]</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\_param_validation.py:213,</span> in <span class="ni">validate_params.&lt;locals&gt;.decorator.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">208</span>     <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span>         <span class="n">skip_parameter_validation</span><span class="o">=</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>             <span class="n">prefer_skip_nested_validation</span> <span class="ow">or</span> <span class="n">global_skip_validation</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>         <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">213</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span> <span class="k">except</span> <span class="n">InvalidParameterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">215</span>     <span class="c1"># When the function is just a wrapper around an estimator, we allow</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span>     <span class="c1"># the function to delegate validation to the estimator, but we replace</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="c1"># the name of the estimator by the name of the function in the error</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="c1"># message to avoid confusion.</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="n">msg</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">220</span>         <span class="sa">r</span><span class="s2">&quot;parameter of \w+ must be&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">221</span>         <span class="sa">f</span><span class="s2">&quot;parameter of </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2"> must be&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">222</span>         <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_validation.py:430,</span> in <span class="ni">cross_validate</span><span class="nt">(estimator, X, y, groups, scoring, cv, n_jobs, verbose, fit_params, params, pre_dispatch, return_train_score, return_estimator, return_indices, error_score)</span>
+<span class="g g-Whitespace">    </span><span class="mi">427</span> <span class="c1"># We clone the estimator to make sure that all the folds are</span>
+<span class="g g-Whitespace">    </span><span class="mi">428</span> <span class="c1"># independent, and that it is pickle-able.</span>
+<span class="g g-Whitespace">    </span><span class="mi">429</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">pre_dispatch</span><span class="o">=</span><span class="n">pre_dispatch</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">430</span> <span class="n">results</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">431</span>     <span class="n">delayed</span><span class="p">(</span><span class="n">_fit_and_score</span><span class="p">)(</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span>         <span class="n">clone</span><span class="p">(</span><span class="n">estimator</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">433</span>         <span class="n">X</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">434</span>         <span class="n">y</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">435</span>         <span class="n">scorer</span><span class="o">=</span><span class="n">scorers</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">436</span>         <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">437</span>         <span class="n">test</span><span class="o">=</span><span class="n">test</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">438</span>         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">439</span>         <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">440</span>         <span class="n">fit_params</span><span class="o">=</span><span class="n">routed_params</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">441</span>         <span class="n">score_params</span><span class="o">=</span><span class="n">routed_params</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">442</span>         <span class="n">return_train_score</span><span class="o">=</span><span class="n">return_train_score</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">443</span>         <span class="n">return_times</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">444</span>         <span class="n">return_estimator</span><span class="o">=</span><span class="n">return_estimator</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">445</span>         <span class="n">error_score</span><span class="o">=</span><span class="n">error_score</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">446</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">447</span>     <span class="k">for</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">indices</span>
+<span class="g g-Whitespace">    </span><span class="mi">448</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">450</span> <span class="n">_warn_or_raise_about_fit_failures</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">error_score</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">452</span> <span class="c1"># For callable scoring, the return type is only know after calling. If the</span>
+<span class="g g-Whitespace">    </span><span class="mi">453</span> <span class="c1"># return type is a dictionary, the error scores can now be inserted with</span>
+<span class="g g-Whitespace">    </span><span class="mi">454</span> <span class="c1"># the correct key.</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\parallel.py:67,</span> in <span class="ni">Parallel.__call__</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">     </span><span class="mi">62</span> <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">63</span> <span class="n">iterable_with_config</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">64</span>     <span class="p">(</span><span class="n">_with_config</span><span class="p">(</span><span class="n">delayed_func</span><span class="p">,</span> <span class="n">config</span><span class="p">),</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">65</span>     <span class="k">for</span> <span class="n">delayed_func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">iterable</span>
+<span class="g g-Whitespace">     </span><span class="mi">66</span> <span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">67</span> <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">iterable_with_config</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\joblib\parallel.py:1918,</span> in <span class="ni">Parallel.__call__</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1916</span>     <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sequential_output</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1917</span>     <span class="nb">next</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1918</span>     <span class="k">return</span> <span class="n">output</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_generator</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1920</span> <span class="c1"># Let&#39;s create an ID that uniquely identifies the current call. If the</span>
+<span class="g g-Whitespace">   </span><span class="mi">1921</span> <span class="c1"># call is interrupted early and that the same instance is immediately</span>
+<span class="g g-Whitespace">   </span><span class="mi">1922</span> <span class="c1"># re-used, this id will be used to prevent workers that were</span>
+<span class="g g-Whitespace">   </span><span class="mi">1923</span> <span class="c1"># concurrently finalizing a task from the previous call to run the</span>
+<span class="g g-Whitespace">   </span><span class="mi">1924</span> <span class="c1"># callback.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1925</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\joblib\parallel.py:1847,</span> in <span class="ni">Parallel._get_sequential_output</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1845</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dispatched_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="g g-Whitespace">   </span><span class="mi">1846</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dispatched_tasks</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="ne">-&gt; </span><span class="mi">1847</span> <span class="n">res</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1848</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_completed_tasks</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="g g-Whitespace">   </span><span class="mi">1849</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_progress</span><span class="p">()</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\parallel.py:129,</span> in <span class="ni">_FuncWrapper.__call__</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">127</span>     <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="g g-Whitespace">    </span><span class="mi">128</span> <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">129</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_validation.py:895,</span> in <span class="ni">_fit_and_score</span><span class="nt">(estimator, X, y, scorer, train, test, verbose, parameters, fit_params, score_params, return_train_score, return_parameters, return_n_test_samples, return_times, return_estimator, split_progress, candidate_progress, error_score)</span>
+<span class="g g-Whitespace">    </span><span class="mi">893</span>         <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">894</span>     <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">895</span>         <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">897</span> <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">898</span>     <span class="c1"># Note fit time as time until error</span>
+<span class="g g-Whitespace">    </span><span class="mi">899</span>     <span class="n">fit_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\base.py:1474,</span> in <span class="ni">_fit_context.&lt;locals&gt;.decorator.&lt;locals&gt;.wrapper</span><span class="nt">(estimator, *args, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1467</span>     <span class="n">estimator</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1469</span> <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1470</span>     <span class="n">skip_parameter_validation</span><span class="o">=</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1471</span>         <span class="n">prefer_skip_nested_validation</span> <span class="ow">or</span> <span class="n">global_skip_validation</span>
+<span class="g g-Whitespace">   </span><span class="mi">1472</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1473</span> <span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1474</span>     <span class="k">return</span> <span class="n">fit_method</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_search.py:970,</span> in <span class="ni">BaseSearchCV.fit</span><span class="nt">(self, X, y, **params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">964</span>     <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_results</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">965</span>         <span class="n">all_candidate_params</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">all_out</span><span class="p">,</span> <span class="n">all_more_results</span>
+<span class="g g-Whitespace">    </span><span class="mi">966</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">968</span>     <span class="k">return</span> <span class="n">results</span>
+<span class="ne">--&gt; </span><span class="mi">970</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_search</span><span class="p">(</span><span class="n">evaluate_candidates</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">972</span> <span class="c1"># multimetric is determined here because in the case of a callable</span>
+<span class="g g-Whitespace">    </span><span class="mi">973</span> <span class="c1"># self.scoring the return type is only known after calling</span>
+<span class="g g-Whitespace">    </span><span class="mi">974</span> <span class="n">first_test_score</span> <span class="o">=</span> <span class="n">all_out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;test_scores&quot;</span><span class="p">]</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_search.py:1527,</span> in <span class="ni">GridSearchCV._run_search</span><span class="nt">(self, evaluate_candidates)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1525</span> <span class="k">def</span> <span class="nf">_run_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluate_candidates</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1526</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Search all candidates in param_grid&quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1527</span>     <span class="n">evaluate_candidates</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_grid</span><span class="p">))</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_search.py:916,</span> in <span class="ni">BaseSearchCV.fit.&lt;locals&gt;.evaluate_candidates</span><span class="nt">(candidate_params, cv, more_results)</span>
+<span class="g g-Whitespace">    </span><span class="mi">908</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">909</span>     <span class="nb">print</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">910</span>         <span class="s2">&quot;Fitting </span><span class="si">{0}</span><span class="s2"> folds for each of </span><span class="si">{1}</span><span class="s2"> candidates,&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">911</span>         <span class="s2">&quot; totalling </span><span class="si">{2}</span><span class="s2"> fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">912</span>             <span class="n">n_splits</span><span class="p">,</span> <span class="n">n_candidates</span><span class="p">,</span> <span class="n">n_candidates</span> <span class="o">*</span> <span class="n">n_splits</span>
+<span class="g g-Whitespace">    </span><span class="mi">913</span>         <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">914</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">916</span> <span class="n">out</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">917</span>     <span class="n">delayed</span><span class="p">(</span><span class="n">_fit_and_score</span><span class="p">)(</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span>         <span class="n">clone</span><span class="p">(</span><span class="n">base_estimator</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span>         <span class="n">X</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>         <span class="n">y</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">921</span>         <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span>         <span class="n">test</span><span class="o">=</span><span class="n">test</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">923</span>         <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">924</span>         <span class="n">split_progress</span><span class="o">=</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">925</span>         <span class="n">candidate_progress</span><span class="o">=</span><span class="p">(</span><span class="n">cand_idx</span><span class="p">,</span> <span class="n">n_candidates</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">926</span>         <span class="o">**</span><span class="n">fit_and_score_kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">927</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">928</span>     <span class="k">for</span> <span class="p">(</span><span class="n">cand_idx</span><span class="p">,</span> <span class="n">parameters</span><span class="p">),</span> <span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">))</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">929</span>         <span class="nb">enumerate</span><span class="p">(</span><span class="n">candidate_params</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">930</span>         <span class="nb">enumerate</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">routed_params</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">split</span><span class="p">)),</span>
+<span class="g g-Whitespace">    </span><span class="mi">931</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">932</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">934</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">935</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">936</span>         <span class="s2">&quot;No fits were performed. &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">937</span>         <span class="s2">&quot;Was the CV iterator empty? &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">938</span>         <span class="s2">&quot;Were there no candidates?&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">939</span>     <span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\parallel.py:67,</span> in <span class="ni">Parallel.__call__</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">     </span><span class="mi">62</span> <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">63</span> <span class="n">iterable_with_config</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">64</span>     <span class="p">(</span><span class="n">_with_config</span><span class="p">(</span><span class="n">delayed_func</span><span class="p">,</span> <span class="n">config</span><span class="p">),</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">65</span>     <span class="k">for</span> <span class="n">delayed_func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">iterable</span>
+<span class="g g-Whitespace">     </span><span class="mi">66</span> <span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">67</span> <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">iterable_with_config</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\joblib\parallel.py:1918,</span> in <span class="ni">Parallel.__call__</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1916</span>     <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sequential_output</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1917</span>     <span class="nb">next</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1918</span>     <span class="k">return</span> <span class="n">output</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_generator</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1920</span> <span class="c1"># Let&#39;s create an ID that uniquely identifies the current call. If the</span>
+<span class="g g-Whitespace">   </span><span class="mi">1921</span> <span class="c1"># call is interrupted early and that the same instance is immediately</span>
+<span class="g g-Whitespace">   </span><span class="mi">1922</span> <span class="c1"># re-used, this id will be used to prevent workers that were</span>
+<span class="g g-Whitespace">   </span><span class="mi">1923</span> <span class="c1"># concurrently finalizing a task from the previous call to run the</span>
+<span class="g g-Whitespace">   </span><span class="mi">1924</span> <span class="c1"># callback.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1925</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\joblib\parallel.py:1847,</span> in <span class="ni">Parallel._get_sequential_output</span><span class="nt">(self, iterable)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1845</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dispatched_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="g g-Whitespace">   </span><span class="mi">1846</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dispatched_tasks</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="ne">-&gt; </span><span class="mi">1847</span> <span class="n">res</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1848</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_completed_tasks</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="g g-Whitespace">   </span><span class="mi">1849</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_progress</span><span class="p">()</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\parallel.py:129,</span> in <span class="ni">_FuncWrapper.__call__</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">127</span>     <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="g g-Whitespace">    </span><span class="mi">128</span> <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">129</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_validation.py:917,</span> in <span class="ni">_fit_and_score</span><span class="nt">(estimator, X, y, scorer, train, test, verbose, parameters, fit_params, score_params, return_train_score, return_parameters, return_n_test_samples, return_times, return_estimator, split_progress, candidate_progress, error_score)</span>
+<span class="g g-Whitespace">    </span><span class="mi">914</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;fit_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="g g-Whitespace">    </span><span class="mi">916</span> <span class="n">fit_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+<span class="ne">--&gt; </span><span class="mi">917</span> <span class="n">test_scores</span> <span class="o">=</span> <span class="n">_score</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span>     <span class="n">estimator</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">scorer</span><span class="p">,</span> <span class="n">score_params_test</span><span class="p">,</span> <span class="n">error_score</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span> <span class="n">score_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">-</span> <span class="n">fit_time</span>
+<span class="g g-Whitespace">    </span><span class="mi">921</span> <span class="k">if</span> <span class="n">return_train_score</span><span class="p">:</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\model_selection\_validation.py:982,</span> in <span class="ni">_score</span><span class="nt">(estimator, X_test, y_test, scorer, score_params, error_score)</span>
+<span class="g g-Whitespace">    </span><span class="mi">980</span>         <span class="n">scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="o">**</span><span class="n">score_params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">981</span>     <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">982</span>         <span class="n">scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="o">**</span><span class="n">score_params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">983</span> <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">984</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scorer</span><span class="p">,</span> <span class="n">_MultimetricScorer</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">985</span>         <span class="c1"># If `_MultimetricScorer` raises exception, the `error_score`</span>
+<span class="g g-Whitespace">    </span><span class="mi">986</span>         <span class="c1"># parameter is equal to &quot;raise&quot;.</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\metrics\_scorer.py:253,</span> in <span class="ni">_BaseScorer.__call__</span><span class="nt">(self, estimator, X, y_true, sample_weight, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">250</span> <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="n">_kwargs</span><span class="p">[</span><span class="s2">&quot;sample_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_weight</span>
+<span class="ne">--&gt; </span><span class="mi">253</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">_cached_call</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\metrics\_scorer.py:345,</span> in <span class="ni">_Scorer._score</span><span class="nt">(self, method_caller, estimator, X, y_true, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">343</span> <span class="n">pos_label</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">is_regressor</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pos_label</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">344</span> <span class="n">response_method</span> <span class="o">=</span> <span class="n">_check_response_method</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_method</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">345</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">method_caller</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">346</span>     <span class="n">estimator</span><span class="p">,</span> <span class="n">response_method</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="n">pos_label</span>
+<span class="g g-Whitespace">    </span><span class="mi">347</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">349</span> <span class="n">scoring_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">350</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="n">scoring_kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\metrics\_scorer.py:87,</span> in <span class="ni">_cached_call</span><span class="nt">(cache, estimator, response_method, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">84</span> <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">response_method</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">85</span>     <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">response_method</span><span class="p">]</span>
+<span class="ne">---&gt; </span><span class="mi">87</span> <span class="n">result</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_response_values</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">88</span>     <span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">response_method</span><span class="o">=</span><span class="n">response_method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="g g-Whitespace">     </span><span class="mi">89</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">91</span> <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">92</span>     <span class="n">cache</span><span class="p">[</span><span class="n">response_method</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\_response.py:210,</span> in <span class="ni">_get_response_values</span><span class="nt">(estimator, X, response_method, pos_label, return_response_method_used)</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span>     <span class="k">elif</span> <span class="n">pos_label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">208</span>         <span class="n">pos_label</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">210</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">prediction_method</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span> <span class="k">if</span> <span class="n">prediction_method</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_log_proba&quot;</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">213</span>     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">_process_predict_proba</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span>         <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">215</span>         <span class="n">target_type</span><span class="o">=</span><span class="n">target_type</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span>         <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>         <span class="n">pos_label</span><span class="o">=</span><span class="n">pos_label</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\pipeline.py:602,</span> in <span class="ni">Pipeline.predict</span><span class="nt">(self, X, **params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">600</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_routing_enabled</span><span class="p">():</span>
+<span class="g g-Whitespace">    </span><span class="mi">601</span>     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">transform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">(</span><span class="n">with_final</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">602</span>         <span class="n">Xt</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Xt</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">603</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">605</span> <span class="c1"># metadata routing enabled</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\utils\_set_output.py:295,</span> in <span class="ni">_wrap_method_output.&lt;locals&gt;.wrapped</span><span class="nt">(self, X, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">293</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">294</span> <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">295</span>     <span class="n">data_to_wrap</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">296</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_to_wrap</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">297</span>         <span class="c1"># only wrap the first output for cross decomposition</span>
+<span class="g g-Whitespace">    </span><span class="mi">298</span>         <span class="n">return_tuple</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">299</span>             <span class="n">_wrap_data_with_container</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">data_to_wrap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">300</span>             <span class="o">*</span><span class="n">data_to_wrap</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+<span class="g g-Whitespace">    </span><span class="mi">301</span>         <span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\compose\_column_transformer.py:1027,</span> in <span class="ni">ColumnTransformer.transform</span><span class="nt">(self, X, **params)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1023</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">Xs</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1024</span>     <span class="c1"># All transformers are None</span>
+<span class="g g-Whitespace">   </span><span class="mi">1025</span>     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="ne">-&gt; </span><span class="mi">1027</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hstack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Xs</span><span class="p">),</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\sklearn\compose\_column_transformer.py:1138,</span> in <span class="ni">ColumnTransformer._hstack</span><span class="nt">(self, Xs, n_samples)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1128</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1129</span>             <span class="s2">&quot;Concatenating DataFrames from the transformer&#39;s output lead to&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1130</span>             <span class="s2">&quot; an inconsistent number of samples. The output may have Pandas&quot;</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1133</span>             <span class="s2">&quot; samples.&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1134</span>         <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1136</span>     <span class="k">return</span> <span class="n">output</span>
+<span class="ne">-&gt; </span><span class="mi">1138</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+
+<span class="nn">File ~\anaconda3\envs\env_pf_data_viz\lib\site-packages\numpy\core\shape_base.py:359,</span> in <span class="ni">hstack</span><span class="nt">(tup, dtype, casting)</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span>     <span class="k">return</span> <span class="n">_nx</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">arrs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="n">casting</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">358</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">359</span>     <span class="k">return</span> <span class="n">_nx</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">arrs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="n">casting</span><span class="p">)</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
 </div>
 </div>
 </div>
-<p>Acá podemos ver un diccionario que contiene los modelos ganadores para cada tipo, un modelo gnador para Support Vectors Machines, un ganador de RandomForest y otro ganador de GradientBoostingClassifier. Arriba podemos ver como le fue a cada uno en training</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluación de rendimiento en el conjunto de prueba</span>
-<span class="n">test_accuracies</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">best_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-    <span class="n">test_accuracies</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">accuracy</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy en test para </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ajuste_svc</span><span class="o">=</span><span class="n">grid_search_svc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">best_model_svc</span><span class="o">=</span><span class="n">ajuste_svc</span><span class="o">.</span><span class="n">best_estimator_</span>
 
-<span class="c1"># Selección del mejor modelo basado en el rendimiento en el conjunto de prueba</span>
-<span class="n">best_model_name</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">test_accuracies</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">test_accuracies</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
-<span class="n">the_best_model</span> <span class="o">=</span> <span class="n">best_models</span><span class="p">[</span><span class="n">best_model_name</span><span class="p">]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">El mejor modelo es: </span><span class="si">{</span><span class="n">best_model_name</span><span class="si">}</span><span class="s2"> con un accuracy en test de </span><span class="si">{</span><span class="n">test_accuracies</span><span class="p">[</span><span class="n">best_model_name</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Resultados de la búsqueda de hiperparámetros</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mejores parámetros encontrados:&quot;</span><span class="p">,</span> <span class="n">best_model_svc</span><span class="p">[</span><span class="s1">&#39;classifier&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy en test para SVC: 0.9222222222222223
-Accuracy en test para RandomForestClassifier: 1.0
-Accuracy en test para GradientBoostingClassifier: 1.0
-
-El mejor modelo es: RandomForestClassifier con un accuracy en test de 1.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-validation scores:  0.9239819575515671
+Mejores parámetros encontrados: SVC(C=0.1, gamma=0.1, kernel=&#39;linear&#39;)
 </pre></div>
 </div>
 </div>
 </div>
-<p>Como vemos, el modelo ganador es GradientBoostingClassifier con una precisión de 91.58 % en test</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">the_best_model</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">best_model_svc</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><style>#sk-container-id-1 {
+<div class="output text_html"><style>#sk-container-id-6 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: black;
   --sklearn-color-line: gray;
@@ -955,15 +1212,15 @@ El mejor modelo es: RandomForestClassifier con un accuracy en test de 1.0
   }
 }
 
-#sk-container-id-1 {
+#sk-container-id-6 {
   color: var(--sklearn-color-text);
 }
 
-#sk-container-id-1 pre {
+#sk-container-id-6 pre {
   padding: 0;
 }
 
-#sk-container-id-1 input.sk-hidden--visually {
+#sk-container-id-6 input.sk-hidden--visually {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px);
@@ -975,7 +1232,7 @@ El mejor modelo es: RandomForestClassifier con un accuracy en test de 1.0
   width: 1px;
 }
 
-#sk-container-id-1 div.sk-dashed-wrapped {
+#sk-container-id-6 div.sk-dashed-wrapped {
   border: 1px dashed var(--sklearn-color-line);
   margin: 0 0.4em 0.5em 0.4em;
   box-sizing: border-box;
@@ -983,7 +1240,7 @@ El mejor modelo es: RandomForestClassifier con un accuracy en test de 1.0
   background-color: var(--sklearn-color-background);
 }
 
-#sk-container-id-1 div.sk-container {
+#sk-container-id-6 div.sk-container {
   /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
      but bootstrap.min.css set `[hidden] { display: none !important; }`
      so we also need the `!important` here to be able to override the
@@ -993,7 +1250,7 @@ El mejor modelo es: RandomForestClassifier con un accuracy en test de 1.0
   position: relative;
 }
 
-#sk-container-id-1 div.sk-text-repr-fallback {
+#sk-container-id-6 div.sk-text-repr-fallback {
   display: none;
 }
 
@@ -1009,14 +1266,14 @@ div.sk-item {
 
 /* Parallel-specific style estimator block */
 
-#sk-container-id-1 div.sk-parallel-item::after {
+#sk-container-id-6 div.sk-parallel-item::after {
   content: "";
   width: 100%;
   border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
   flex-grow: 1;
 }
 
-#sk-container-id-1 div.sk-parallel {
+#sk-container-id-6 div.sk-parallel {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -1024,28 +1281,28 @@ div.sk-item {
   position: relative;
 }
 
-#sk-container-id-1 div.sk-parallel-item {
+#sk-container-id-6 div.sk-parallel-item {
   display: flex;
   flex-direction: column;
 }
 
-#sk-container-id-1 div.sk-parallel-item:first-child::after {
+#sk-container-id-6 div.sk-parallel-item:first-child::after {
   align-self: flex-end;
   width: 50%;
 }
 
-#sk-container-id-1 div.sk-parallel-item:last-child::after {
+#sk-container-id-6 div.sk-parallel-item:last-child::after {
   align-self: flex-start;
   width: 50%;
 }
 
-#sk-container-id-1 div.sk-parallel-item:only-child::after {
+#sk-container-id-6 div.sk-parallel-item:only-child::after {
   width: 0;
 }
 
 /* Serial-specific style estimator block */
 
-#sk-container-id-1 div.sk-serial {
+#sk-container-id-6 div.sk-serial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1063,14 +1320,14 @@ clickable and can be expanded/collapsed.
 
 /* Pipeline and ColumnTransformer style (default) */
 
-#sk-container-id-1 div.sk-toggleable {
+#sk-container-id-6 div.sk-toggleable {
   /* Default theme specific background. It is overwritten whether we have a
   specific estimator or a Pipeline/ColumnTransformer */
   background-color: var(--sklearn-color-background);
 }
 
 /* Toggleable label */
-#sk-container-id-1 label.sk-toggleable__label {
+#sk-container-id-6 label.sk-toggleable__label {
   cursor: pointer;
   display: block;
   width: 100%;
@@ -1080,7 +1337,7 @@ clickable and can be expanded/collapsed.
   text-align: center;
 }
 
-#sk-container-id-1 label.sk-toggleable__label-arrow:before {
+#sk-container-id-6 label.sk-toggleable__label-arrow:before {
   /* Arrow on the left of the label */
   content: "▸";
   float: left;
@@ -1088,13 +1345,13 @@ clickable and can be expanded/collapsed.
   color: var(--sklearn-color-icon);
 }
 
-#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
+#sk-container-id-6 label.sk-toggleable__label-arrow:hover:before {
   color: var(--sklearn-color-text);
 }
 
 /* Toggleable content - dropdown */
 
-#sk-container-id-1 div.sk-toggleable__content {
+#sk-container-id-6 div.sk-toggleable__content {
   max-height: 0;
   max-width: 0;
   overflow: hidden;
@@ -1103,12 +1360,12 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-1 div.sk-toggleable__content.fitted {
+#sk-container-id-6 div.sk-toggleable__content.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-1 div.sk-toggleable__content pre {
+#sk-container-id-6 div.sk-toggleable__content pre {
   margin: 0.2em;
   border-radius: 0.25em;
   color: var(--sklearn-color-text);
@@ -1116,79 +1373,79 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-1 div.sk-toggleable__content.fitted pre {
+#sk-container-id-6 div.sk-toggleable__content.fitted pre {
   /* unfitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+#sk-container-id-6 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
   max-height: 200px;
   max-width: 100%;
   overflow: auto;
 }
 
-#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+#sk-container-id-6 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
   content: "▾";
 }
 
 /* Pipeline/ColumnTransformer-specific style */
 
-#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-6 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-6 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator-specific style */
 
 /* Colorize estimator box */
-#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-6 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-6 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
-#sk-container-id-1 div.sk-label label.sk-toggleable__label,
-#sk-container-id-1 div.sk-label label {
+#sk-container-id-6 div.sk-label label.sk-toggleable__label,
+#sk-container-id-6 div.sk-label label {
   /* The background is the default theme color */
   color: var(--sklearn-color-text-on-default-background);
 }
 
 /* On hover, darken the color of the background */
-#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
+#sk-container-id-6 div.sk-label:hover label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
 /* Label box, darken color on hover, fitted */
-#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+#sk-container-id-6 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator label */
 
-#sk-container-id-1 div.sk-label label {
+#sk-container-id-6 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
   display: inline-block;
   line-height: 1.2em;
 }
 
-#sk-container-id-1 div.sk-label-container {
+#sk-container-id-6 div.sk-label-container {
   text-align: center;
 }
 
 /* Estimator-specific */
-#sk-container-id-1 div.sk-estimator {
+#sk-container-id-6 div.sk-estimator {
   font-family: monospace;
   border: 1px dotted var(--sklearn-color-border-box);
   border-radius: 0.25em;
@@ -1198,18 +1455,18 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-1 div.sk-estimator.fitted {
+#sk-container-id-6 div.sk-estimator.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
 /* on hover */
-#sk-container-id-1 div.sk-estimator:hover {
+#sk-container-id-6 div.sk-estimator:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-1 div.sk-estimator.fitted:hover {
+#sk-container-id-6 div.sk-estimator.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
@@ -1296,7 +1553,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 /* "?"-specific style due to the `<a>` HTML tag */
 
-#sk-container-id-1 a.estimator_doc_link {
+#sk-container-id-6 a.estimator_doc_link {
   float: right;
   font-size: 1rem;
   line-height: 1em;
@@ -1311,34 +1568,559 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   border: var(--sklearn-color-unfitted-level-1) 1pt solid;
 }
 
-#sk-container-id-1 a.estimator_doc_link.fitted {
+#sk-container-id-6 a.estimator_doc_link.fitted {
   /* fitted */
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
 
 /* On hover */
-#sk-container-id-1 a.estimator_doc_link:hover {
+#sk-container-id-6 a.estimator_doc_link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
   color: var(--sklearn-color-background);
   text-decoration: none;
 }
 
-#sk-container-id-1 a.estimator_doc_link.fitted:hover {
+#sk-container-id-6 a.estimator_doc_link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
-                 ColumnTransformer(remainder=&#x27;passthrough&#x27;,
-                                   transformers=[(&#x27;cat&#x27;, OrdinalEncoder(),
-                                                  [])])),
-                (&#x27;classifier&#x27;, RandomForestClassifier(min_samples_split=20))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
-                 ColumnTransformer(remainder=&#x27;passthrough&#x27;,
-                                   transformers=[(&#x27;cat&#x27;, OrdinalEncoder(),
-                                                  [])])),
-                (&#x27;classifier&#x27;, RandomForestClassifier(min_samples_split=20))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;preprocessor: ColumnTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(remainder=&#x27;passthrough&#x27;,
-                  transformers=[(&#x27;cat&#x27;, OrdinalEncoder(), [])])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">cat</label><div class="sk-toggleable__content fitted"><pre>[]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;OrdinalEncoder<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.preprocessing.OrdinalEncoder.html">?<span>Documentation for OrdinalEncoder</span></a></label><div class="sk-toggleable__content fitted"><pre>OrdinalEncoder()</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">remainder</label><div class="sk-toggleable__content fitted"><pre>[&#x27;horizon_days&#x27;, &#x27;price_BUY&#x27;, &#x27;price_SELL&#x27;, &#x27;Sharpe_Ratio&#x27;, &#x27;expected_return_yearly&#x27;, &#x27;inflation&#x27;, &#x27;nominal_return&#x27;, &#x27;ESG_ranking&#x27;, &#x27;PE_ratio&#x27;, &#x27;EPS_ratio&#x27;, &#x27;PS_ratio&#x27;, &#x27;PB_ratio&#x27;, &#x27;NetProfitMargin_ratio&#x27;, &#x27;current_ratio&#x27;, &#x27;roa_ratio&#x27;, &#x27;roe_ratio&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">passthrough</label><div class="sk-toggleable__content fitted"><pre>passthrough</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" ><label for="sk-estimator-id-7" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;RandomForestClassifier<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.ensemble.RandomForestClassifier.html">?<span>Documentation for RandomForestClassifier</span></a></label><div class="sk-toggleable__content fitted"><pre>RandomForestClassifier(min_samples_split=20)</pre></div> </div></div></div></div></div></div></div></div>
+</style><div id="sk-container-id-6" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>SVC(C=0.1, gamma=0.1, kernel=&#x27;linear&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-26" type="checkbox" checked><label for="sk-estimator-id-26" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;SVC<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.svm.SVC.html">?<span>Documentation for SVC</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>SVC(C=0.1, gamma=0.1, kernel=&#x27;linear&#x27;)</pre></div> </div></div></div></div></div></div>
+</div>
+</section>
+<section id="random-forest">
+<h2>Random Forest<a class="headerlink" href="#random-forest" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param_grid_rf</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span><span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid_search_rf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">RandomForestClassifier</span><span class="p">(),</span> <span class="n">param_grid_rf</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">shuffle_split</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;recall&#39;</span><span class="p">)</span>
+<span class="n">grid_search_results_rf</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">grid_search_rf</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross-validation scores: &quot;</span><span class="p">,</span> <span class="n">grid_search_results_rf</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean cross-validation score: &quot;</span><span class="p">,</span> <span class="n">grid_search_results_rf</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-validation scores:  [1.         0.98550725 0.98550725 1.         1.        ]
+Mean cross-validation score:  0.9942028985507246
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ajuste_rf</span><span class="o">=</span><span class="n">grid_search_rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">best_model_rf</span><span class="o">=</span><span class="n">ajuste_rf</span><span class="o">.</span><span class="n">best_estimator_</span>
+
+<span class="c1"># Resultados de la búsqueda de hiperparámetros</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mejores parámetros encontrados:&quot;</span><span class="p">,</span> <span class="n">best_model_rf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mejores parámetros encontrados: RandomForestClassifier(max_depth=20, min_samples_split=5)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">best_model_rf</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-7 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-7 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-7 pre {
+  padding: 0;
+}
+
+#sk-container-id-7 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-7 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-7 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-7 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-7 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-7 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-7 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-7 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-7 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-7 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-7 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-7 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-7 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-7 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-7 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-7 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-7 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-7 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-7 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-7 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-7 div.sk-label label.sk-toggleable__label,
+#sk-container-id-7 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-7 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-7 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-7 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-7 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-7 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-7 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-7 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-7 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-7 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-7 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-7 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-7" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>RandomForestClassifier(max_depth=20, min_samples_split=5)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-27" type="checkbox" checked><label for="sk-estimator-id-27" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;RandomForestClassifier<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.ensemble.RandomForestClassifier.html">?<span>Documentation for RandomForestClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>RandomForestClassifier(max_depth=20, min_samples_split=5)</pre></div> </div></div></div></div></div></div>
+</div>
+</section>
+<section id="xgboost">
+<h2>XGBoost<a class="headerlink" href="#xgboost" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param_grid_xgb</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span><span class="s1">&#39;subsample&#39;</span><span class="p">:[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">]}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid_search_xgb</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">GradientBoostingClassifier</span><span class="p">(),</span> <span class="n">param_grid_xgb</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">shuffle_split</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;recall&#39;</span><span class="p">)</span>
+<span class="n">grid_search_results_xgb</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">grid_search_xgb</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross-validation scores: &quot;</span><span class="p">,</span> <span class="n">grid_search_results_xgb</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean cross-validation score: &quot;</span><span class="p">,</span> <span class="n">grid_search_results_xgb</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-validation scores:  [1.         0.98550725 1.         1.         1.        ]
+Mean cross-validation score:  0.9971014492753623
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ajuste_xgb</span><span class="o">=</span><span class="n">grid_search_xgb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">best_model_xgb</span><span class="o">=</span><span class="n">ajuste_xgb</span><span class="o">.</span><span class="n">best_estimator_</span>
+
+<span class="c1"># Resultados de la búsqueda de hiperparámetros</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mejores parámetros encontrados:&quot;</span><span class="p">,</span> <span class="n">best_model_xgb</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mejores parámetros encontrados: GradientBoostingClassifier(learning_rate=0.01, max_depth=None, n_estimators=50,
+                           subsample=1)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Por último, vemos los 3 objetos entrenados:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">best_model_svc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">best_model_rf</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">best_model_xgb</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pipeline(steps=[(&#39;preprocessor&#39;,
+                 ColumnTransformer(remainder=&#39;passthrough&#39;,
+                                   transformers=[(&#39;num&#39;, StandardScaler(),
+                                                  [&#39;horizon_days&#39;, &#39;price_BUY&#39;,
+                                                   &#39;price_SELL&#39;, &#39;Sharpe_Ratio&#39;,
+                                                   &#39;expected_return_yearly&#39;,
+                                                   &#39;inflation&#39;,
+                                                   &#39;nominal_return&#39;,
+                                                   &#39;ESG_ranking&#39;, &#39;PE_ratio&#39;,
+                                                   &#39;EPS_ratio&#39;, &#39;PS_ratio&#39;,
+                                                   &#39;PB_ratio&#39;,
+                                                   &#39;NetProfitMargin_ratio&#39;,
+                                                   &#39;current_ratio&#39;, &#39;roa_ratio&#39;,
+                                                   &#39;roe_ratio&#39;])])),
+                (&#39;classifier&#39;, SVC(C=0.1, gamma=0.1, kernel=&#39;linear&#39;))])
+RandomForestClassifier(max_depth=20, min_samples_split=5)
+GradientBoostingClassifier(learning_rate=0.01, max_depth=None, n_estimators=50,
+                           subsample=1)
+</pre></div>
+</div>
+</div>
 </div>
 <p>Miramos el reporte de métricas completas que nos ofrece Sklearn</p>
 <p>Usamos un conjunto de datos de validación que proviene de fuentes locales, para simular con datos nuevos empresariales que vienen de afuera y que aún no conoce el modelo</p>
@@ -1369,46 +2151,130 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred</span><span class="o">=</span><span class="n">best_models</span><span class="p">[</span><span class="s1">&#39;RandomForestClassifier&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
-<span class="n">reporte</span><span class="o">=</span><span class="n">metrics</span><span class="o">.</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">reporte</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calcular las métricas para el SVC</span>
+<span class="n">y_pred1</span> <span class="o">=</span> <span class="n">best_model_svc</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">precision1</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred1</span><span class="p">)</span>
+<span class="n">recall1</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred1</span><span class="p">)</span>
+<span class="n">accuracy1</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred1</span><span class="p">)</span>
+<span class="n">f1_score1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred1</span><span class="p">)</span>
+
+<span class="c1"># Calcular las métricas para el RandomForest</span>
+<span class="n">y_pred2</span> <span class="o">=</span> <span class="n">best_model_rf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">precision2</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred2</span><span class="p">)</span>
+<span class="n">recall2</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred2</span><span class="p">)</span>
+<span class="n">accuracy2</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred2</span><span class="p">)</span>
+<span class="n">f1_score2</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred2</span><span class="p">)</span>
+
+<span class="c1"># Calcular las métricas para el XGBoost</span>
+<span class="n">y_pred3</span> <span class="o">=</span> <span class="n">best_model_xgb</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">precision3</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred3</span><span class="p">)</span>
+<span class="n">recall3</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred3</span><span class="p">)</span>
+<span class="n">accuracy3</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred3</span><span class="p">)</span>
+<span class="n">f1_score3</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>              precision    recall  f1-score   support
-
-           0     0.9967    1.0000    0.9983       301
-           1     1.0000    0.9933    0.9966       149
-
-    accuracy                         0.9978       450
-   macro avg     0.9983    0.9966    0.9975       450
-weighted avg     0.9978    0.9978    0.9978       450
-</pre></div>
 </div>
-</div>
-</div>
-<p>En el reporte de arriba, vemos:</p>
-<ul class="simple">
-<li><p>Precision: Para la clase 1 (GOOD investment), el 100% de los casos predichas buenas inversiones son realmente buenas inversiones.</p></li>
-<li><p>Recall: Para la clase 1, el 99.29% de los casos que hubo buenas inversiones en el conjunto de datos fueron correctamente detectadas.</p></li>
-<li><p>F1-Score: Es una medida combinada de precisión y recall.</p></li>
-<li><p>Support: El número de casos de cada clase en el conjunto de datos, en este caso de validación.</p></li>
-<li><p>Accuracy: La precisión general del modelo  (99.75 %)</p></li>
-<li><p>Macro avg: Es el promedio no ponderado de las métricas para todas las clases.</p></li>
-<li><p>Weighted avg: Es el promedio ponderado de las métricas para todas las clases, ponderado por el soporte de cada clase.</p></li>
-</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">conf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conf_matrix</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_reporte</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Modelo&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Support Vector Classifier&#39;</span><span class="p">,</span> <span class="s1">&#39;Random Forest Classifier&#39;</span><span class="p">,</span> <span class="s1">&#39;XGBoost Classifier&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;Precision&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">precision1</span><span class="p">,</span> <span class="n">precision2</span><span class="p">,</span> <span class="n">precision3</span><span class="p">],</span>
+    <span class="s1">&#39;Recall&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">recall1</span><span class="p">,</span> <span class="n">recall2</span><span class="p">,</span> <span class="n">recall3</span><span class="p">],</span>
+    <span class="s1">&#39;Accuracy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">accuracy1</span><span class="p">,</span> <span class="n">accuracy2</span><span class="p">,</span> <span class="n">accuracy3</span><span class="p">],</span>
+    <span class="s1">&#39;F1-score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">f1_score1</span><span class="p">,</span> <span class="n">f1_score2</span><span class="p">,</span> <span class="n">f1_score3</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">df_reporte</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_reporte</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Rendimiento de modelos para conjunto de datos de valdiación</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_reporte</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matriz de Confusión:
- [[301   0]
- [  1 148]]
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Modelo</th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>Accuracy</th>
+      <th>F1-score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Support Vector Classifier</td>
+      <td>0.756098</td>
+      <td>0.928144</td>
+      <td>0.862222</td>
+      <td>0.833333</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Random Forest Classifier</td>
+      <td>1.000000</td>
+      <td>0.994012</td>
+      <td>0.997778</td>
+      <td>0.996997</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>XGBoost Classifier</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">conf_matrix_svc</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión SVC:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conf_matrix_svc</span><span class="p">)</span>
+
+<span class="n">conf_matrix_rf</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión RandomForest:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conf_matrix_rf</span><span class="p">)</span>
+
+<span class="n">conf_matrix_xgb</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión XGBoost:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conf_matrix_xgb</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matriz de Confusión SVC:
+ [[233  50]
+ [ 12 155]]
+Matriz de Confusión RandomForest:
+ [[283   0]
+ [  1 166]]
+Matriz de Confusión XGBoost:
+ [[283   0]
+ [  0 167]]
 </pre></div>
 </div>
 </div>
@@ -1416,32 +2282,67 @@ weighted avg     0.9978    0.9978    0.9978       450
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualizar la matriz de confusión</span>
-<span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">conf_matrix</span><span class="p">)</span>
+<span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">conf_matrix_svc</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión - Modelo ganador&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión - Modelo ganador Supprot Vector Machines&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/9b663e323f9e91131d1d4063bd032dfeac5a42d8cb96a49b93e919caa203a332.png" src="_images/9b663e323f9e91131d1d4063bd032dfeac5a42d8cb96a49b93e919caa203a332.png" />
+<img alt="_images/d388c8d75eb1e2b8adbea92f408ad06e85b15a22af04b970955dc040e933c560.png" src="_images/d388c8d75eb1e2b8adbea92f408ad06e85b15a22af04b970955dc040e933c560.png" />
 </div>
 </div>
-<p>Como resultado del training, test y validation, tenemos que el modelo que mejor se comporta para clasificar es un <code class="docutils literal notranslate"><span class="pre">RandomForestClassifier(n_estimators=50,</span> <span class="pre">max_depth=None,</span> <span class="pre">min_samples_split=5)</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualizar la matriz de confusión</span>
+<span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">conf_matrix_rf</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión - Modelo ganador Random Forest&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/16e196da0ffcac0c31dd448915168c48a0440aadfdf103641672ce66d3257bee.png" src="_images/16e196da0ffcac0c31dd448915168c48a0440aadfdf103641672ce66d3257bee.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualizar la matriz de confusión</span>
+<span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">conf_matrix_xgb</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Matriz de Confusión - Modelo ganador XGBoost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/981981bb3362de97047d0b307bab10c1de8538f6ba1b5ee8c9d6e0ea21076fcb.png" src="_images/981981bb3362de97047d0b307bab10c1de8538f6ba1b5ee8c9d6e0ea21076fcb.png" />
+</div>
+</div>
+<p>Como podemos observar con los datos que nunca ha visto el modelo:</p>
+<ul class="simple">
+<li><p>El modelo de clasificación XGBoost posee un valor de recall de 1, tanto en conjuntos de datos de pruebas como en conjunto de validaciones. Esto se puede deber a que los datos de entrenamiento de este problema de clasificación sean intrínsecamente fácil para el modelo que estás utilizando, por lo que puede obtener un rendimiento perfecto en todos los conjuntos de datos.</p></li>
+<li><p>Respecto al Random Forest, vemos que el rendimiento del modelo en el conjunto de datos de prueba nos presenta valores de recall demasiado altos, los cuales en el conjunto de datos de valdiación, que son datos que nunca ha visto, se ven reflejados con los mismos comportamientos en su rendimiento. Este es el modelo</p></li>
+<li><p>Respecto al modelo de support vector machines, tuvimos que usar preprocesamiento de escalamiento de datos para que todo esté aproximadamente en la misma escala. Este fue el modelo que posee más generalizacion de los demas, lo podemos ver reflejado en sus medidas de rendimientos.</p></li>
+</ul>
 </section>
 <section id="visibilidad-y-entendimiento-del-modelo">
 <h2>Visibilidad y entendimiento del modelo<a class="headerlink" href="#visibilidad-y-entendimiento-del-modelo" title="Link to this heading">#</a></h2>
-<p>En esta sección buscamos entender cómo es el modelo ganador, mediante varias tecnicas</p>
+<p>En esta sección buscamos entender cómo es el modelo de RandomForest, mediante varias tecnicas</p>
 <p>El “feature importance” (importancia de las características) en un modelo de aprendizaje automático, indica cuánto contribuye cada característica (o atributo) al rendimiento general del modelo en la tarea de predicción. Es una medida útil para entender qué características son más relevantes para la predicción de la variable objetivo.</p>
 <p>En este caso podemos ver que la variable <code class="docutils literal notranslate"><span class="pre">inflation</span></code> y <code class="docutils literal notranslate"><span class="pre">nominal_return</span></code> (Inflación durante la variable horizon_days y Retorno nominal) aporta mas 35% en la prediccion de si la firma es buena para invertir o no, dando a entender que para <strong>este</strong> modelo en especifico son variables importantes</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Obtener la importancia de las características</span>
-<span class="n">feature_importances</span> <span class="o">=</span> <span class="n">the_best_model</span><span class="p">[</span><span class="s1">&#39;classifier&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">feature_importances_</span>
+<span class="n">feature_importances</span> <span class="o">=</span> <span class="n">best_model_rf</span><span class="o">.</span><span class="n">feature_importances_</span>
 
 <span class="c1"># Obtener los nombres de las características</span>
-<span class="n">feature_names</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">columns</span>  <span class="c1"># Reemplaza esto con el nombre de tus características si tienes</span>
+<span class="n">feature_names</span> <span class="o">=</span> <span class="n">X_valid</span><span class="o">.</span><span class="n">columns</span>  <span class="c1"># Reemplaza esto con el nombre de tus características si tienes</span>
 
 <span class="c1"># Ordenar las características por su importancia</span>
 <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">feature_importances</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1453,24 +2354,13 @@ weighted avg     0.9978    0.9978    0.9978       450
 <span class="n">plt</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">sorted_feature_names</span><span class="p">,</span> <span class="n">sorted_feature_importances</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Porcentaje  de importancia de las Variables&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Variables&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Importancia de las Variables (Modelo ganador)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Importancia de las Variables (Random Forest)&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/8cdb55053c84bc1b440a15ade72389938bb3c192d32d25b908527d1640e617be.png" src="_images/8cdb55053c84bc1b440a15ade72389938bb3c192d32d25b908527d1640e617be.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Crear el objeto explainer</span>
-<span class="c1"># explainer = shap.TreeExplainer(the_best_model[&#39;classifier&#39;])</span>
-
-<span class="c1"># # Calcular SHAP values para las observaciones de prueba</span>
-<span class="c1"># shap_values = explainer.shap_values(X_valid)</span>
-</pre></div>
-</div>
+<img alt="_images/492bceaea400511ac543d2bf35cc7bf5359c5f926ea0b3d946e8d4defe82a674.png" src="_images/492bceaea400511ac543d2bf35cc7bf5359c5f926ea0b3d946e8d4defe82a674.png" />
 </div>
 </div>
 </section>
@@ -1479,13 +2369,13 @@ weighted avg     0.9978    0.9978    0.9978       450
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Guardar el modelo en un archivo</span>
-<span class="n">clf</span><span class="o">=</span><span class="n">the_best_model</span>
-<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="s1">&#39;modelo_ganador_.joblib&#39;</span><span class="p">)</span>
+<span class="n">clf</span><span class="o">=</span><span class="n">best_model_rf</span>
+<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="s1">&#39;C:/Users/Pc Com/Documents/modelo_ganador__.joblib&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;modelo_ganador_.joblib&#39;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;C:/Users/Pc Com/Documents/modelo_ganador__.joblib&#39;]
 </pre></div>
 </div>
 </div>
@@ -1549,10 +2439,13 @@ weighted avg     0.9978    0.9978    0.9978       450
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-librerias">Importación de librerias</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-datos">Importacion de datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-datos">Importación de datos</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizacion">Parametrización</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelos-de-clasificacion">Modelos de clasificación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metodologia-propuesta">Metodologia propuesta</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#support-vector-machines">Support Vector Machines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#random-forest">Random Forest</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost">XGBoost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visibilidad-y-entendimiento-del-modelo">Visibilidad y entendimiento del modelo</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-del-modelo">Importacion del modelo</a></li>
 </ul>

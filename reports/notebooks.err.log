@@ -38,7 +38,7 @@ File [1;32m<string>:1[0m
 The above exception was the direct cause of the following exception:
 
 [1;31mPatsyError[0m                                Traceback (most recent call last)
-Cell [1;32mIn[17], line 1[0m
+Cell [1;32mIn[25], line 1[0m
 [1;32m----> 1[0m modelo_logit [38;5;241m=[39m [43mlogit[49m[43m([49m[38;5;124;43m'[39;49m[38;5;124;43minvestment ~ horizon_days + amount + price_BUY + price_SELL + Volatility_Buy + Volatility_sell + Sharpe_ratio + expected_return_yearly + inflation + nominal_return + ESG_ranking + PE_ratio + EPS_ratio + PS_ratio + PB_ratio + NetProfitMargin_ratio + current_ratio + roa_ratio + roe_ratio[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[43mdata[49m[38;5;241;43m=[39;49m[43mdata_1[49m[43m)[49m[38;5;241m.[39mfit()
 
 File [1;32m~\anaconda3\envs\env_pf_data_viz\lib\site-packages\statsmodels\base\model.py:203[0m, in [0;36mModel.from_formula[1;34m(cls, formula, data, subset, drop_cols, *args, **kwargs)[0m
